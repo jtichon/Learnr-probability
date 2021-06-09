@@ -1,0 +1,183 @@
+---
+title: "Probability Distributions in R"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE, warning = FALSE, message = FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+<style>
+
+.tt {
+  font-family:'Lucida Console', monospace; 
+  text-align:center
+}
+
+h2 {
+  color: darkgreen;
+  font-weight: bold
+}
+
+h3 {
+  color: darkolivegreen;
+}
+
+.topicsContainer {
+  background-color: #f2f7f6;
+
+}
+
+.topic.current {
+  background-color: #e6fcf8;
+  border-color: #41ab98;
+  border: solid 1px;
+  font-weight: bold
+}
+
+.band {
+  padding-left: 0%
+}
+
+.topicsFooter .resetButton {
+  font-size: 80%;
+}
+
+.btn-primary, .btn-success, .btn-info {
+    background-color: darkgreen;
+    background-image: none;
+    border: none;
+}
+    .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary:focus:active, .btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success:focus:active, .btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info:focus:active {
+    background-color: darkolivegreen; }
+  .btn-primary:focus:hover, .btn-primary:active:hover, .btn-primary:focus:active:hover, .btn-success:focus:hover, .btn-success:active:hover, .btn-success:focus:active:hover, .btn-info:focus:hover, .btn-info:active:hover, .btn-info:focus:active:hover {
+    background-color: darkolivegreen; }
+  .btn-primary.disabled, .btn-primary:disabled, .btn-primary.disabled:hover, .btn-primary:disabled:hover, .btn-success.disabled, .btn-success:disabled, .btn-success.disabled:hover, .btn-success:disabled:hover, .btn-info.disabled, .btn-info:disabled, .btn-info.disabled:hover, .btn-info:disabled:hover {
+    background-color: darkolivegreen; }
+    
+.boxed{
+ border: 3px solid green ;
+ padding: 5px;
+}
+
+
+</style>
+
+## Probability Distributions in R
+
+### Introduction
+
+In this tutorial we learn about various common probability distributions used in R that have pre-made functions built in to R for solving various problems.
+
+For each distribution we will:
+
+* Review the distribution's pdf, shape, and parameters
+
+* Use R to calculate the probability of falling in a range of values
+
+* Use R to calculate quantiles for the distribution
+
+* Use R to find the value of the PDF at a particular $x$
+
+* Generate random values from the distribution
+
+
+## The Uniform Distribution
+
+### The Parameters and PDF of a Continuous Uniform Distirbution
+
+In a (continuous) uniform distribution, all points in the sample space are equally likely to occur. This means that our PDF is a flat line and the area under the PDF is a rectangle. To completely identify a uniform distribution, we need to know the range of values our variable can take on. For a random variable $X$ that follows a uniform distribution that takes on values between $a$ and $b$ we write:
+
+$$X\sim U(a, b)$$
+
+and express the PDF as:
+
+\begin{equation*}
+f(x)=\begin{cases}
+          \dfrac{1}{b-1} \quad &\text{if} \, x \in \left[a,b\right] \\
+          0 \quad &\text{otherwise}\\
+     \end{cases}
+\end{equation*}
+
+The graph of the PDF is:
+
+```{r, warning = FALSE, message = FALSE}
+library(tidyverse)
+dat <- data.frame(x1 = 2, x2 = 10, y1 = 1/8, y2 = 1/8)
+ggplot(dat) +
+  geom_segment(aes(x=x1, y = y1, xend = x2, yend = y2)) +
+  ylim(0, 0.150) +
+  xlab("x") +
+  ylab("f(x)") +
+  scale_x_continuous(breaks= c(2, 10),
+              labels= c("a", "b")) +
+  ggtitle("PDF of X~U(a,b)") +
+  theme_classic() +
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=14))
+```
+
+### Area to the Left
+
+To find the probability of being less than a point $q$, i.e.
+
+$$ P(X<q) = \int_{-\infty}^qf(t)dt,$$
+we can use the 
+
+<p class = "tt">punif(q, min = a, max = b)</p>
+
+function. If no values are specified for $a$ and $b$, R will assume you want the interval $(0,1)$ by default.
+
+<div class = "example">
+**Example** Suppose $X$ follows a uniform distribution from 7 to 23. What is the probability that $X$ is less then 19?
+
+</div>
+
+<div class = "solution">
+**Solution** $P(X<19)=$
+
+```{r, echo = TRUE}
+punif(19, 7, 23)
+```
+
+Visually, this looks like:
+
+```{r, warning = FALSE, message = FALSE}
+f <- function(x){
+  if(7<= x & x <= 23) y <- 1/16
+  else y <- 0
+  return(y)
+}
+
+x = seq(from=7,to=23,by=.005)
+y = sapply(X=x,FUN=f,simplify=TRUE,USE.NAMES=FALSE)
+df = data.frame(X=x,Y=y)
+
+ggplot(data=df, mapping=aes(x=X, y=Y)) +
+    geom_line()+
+    geom_area(mapping=aes(x=ifelse(x>7 & x<19, x, 0)), fill="lightblue", alpha=1, color = "black") +
+    ylim(0, 0.07) +
+    xlim(5, 25) +
+   xlab("x") +
+    ylab("f(x)") +
+    ggtitle("P(X<19) for X~U(7,23)") +
+   theme_classic() +
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=14))
+
+# dat <- data.frame(x1 = 7, x2 = 23, y1 = 1/16, y2 = 1/16)
+# ggplot(dat) +
+#   geom_segment(aes(x=x1, y = y1, xend = x2, yend = y2)) +
+#   ylim(0, 0.07) +
+#   xlab("x") +
+#   ylab("f(x)") +
+#   ggtitle("PDF of X~U(7,23)") +
+#   theme_classic()
+```
+</div>
+
+## The Normal Distribution
+
+
+## The Binomial Distribution

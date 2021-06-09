@@ -1,0 +1,514 @@
+---
+title: "Probability Distributions in R"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE, warning = FALSE, message = FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+<style>
+
+.tt {
+  font-family:'Lucida Console', monospace; 
+  text-align:center
+}
+
+h2 {
+  color: darkgreen;
+  font-weight: bold
+}
+
+h3 {
+  color: darkolivegreen;
+}
+
+.topicsContainer {
+  background-color: #f2f7f6;
+
+}
+
+.topic.current {
+  background-color: #e6fcf8;
+  border-color: #41ab98;
+  border: solid 1px;
+  font-weight: bold
+}
+
+.band {
+  padding-left: 0%
+}
+
+.topicsFooter .resetButton {
+  font-size: 80%;
+}
+
+.btn-primary, .btn-success, .btn-info {
+    background-color: darkgreen;
+    background-image: none;
+    border: none;
+}
+    .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary:focus:active, .btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success:focus:active, .btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info:focus:active {
+    background-color: darkolivegreen; }
+  .btn-primary:focus:hover, .btn-primary:active:hover, .btn-primary:focus:active:hover, .btn-success:focus:hover, .btn-success:active:hover, .btn-success:focus:active:hover, .btn-info:focus:hover, .btn-info:active:hover, .btn-info:focus:active:hover {
+    background-color: darkolivegreen; }
+  .btn-primary.disabled, .btn-primary:disabled, .btn-primary.disabled:hover, .btn-primary:disabled:hover, .btn-success.disabled, .btn-success:disabled, .btn-success.disabled:hover, .btn-success:disabled:hover, .btn-info.disabled, .btn-info:disabled, .btn-info.disabled:hover, .btn-info:disabled:hover {
+    background-color: darkolivegreen; }
+    
+.boxed{
+ border: 3px solid green ;
+ padding: 5px;
+}
+
+
+</style>
+
+## Probability Distributions in R
+
+### Introduction
+
+In this tutorial we learn about various common probability distributions used in R that have pre-made functions built in to R for solving various problems.
+
+For each distribution we will:
+
+* Review the distribution's pdf, shape, and parameters
+
+* Use R to calculate the probability of falling in a range of values
+
+* Use R to calculate quantiles for the distribution
+
+* Use R to find the value of the PDF at a particular $x$
+
+* Generate random values from the distribution
+
+
+## The Uniform Distribution
+
+### The Parameters and PDF of a Continuous Uniform Distirbution
+
+In a (continuous) uniform distribution, all points in the sample space are equally likely to occur. This means that our PDF is a flat line and the area under the PDF is a rectangle. To completely identify a uniform distribution, we need to know the range of values our variable can take on. For a random variable $X$ that follows a uniform distribution that takes on values between $a$ and $b$ we write:
+
+$$X\sim U(a, b)$$
+
+and express the PDF as:
+
+\begin{equation*}
+f(x)=\begin{cases}
+          \dfrac{1}{b-a} \quad &\text{if} \, x \in \left[a,b\right] \\
+          0 \quad &\text{otherwise}\\
+     \end{cases}
+\end{equation*}
+
+**NOTE**: This is the same as saying the height of the density curve is 1 / (base) as the area of a rectangle is (base) x (height) and that must equal 1.
+
+The graph of the PDF is:
+
+```{r, warning = FALSE, message = FALSE}
+library(tidyverse)
+dat <- data.frame(x1 = 2, x2 = 10, y1 = 1/8, y2 = 1/8)
+ggplot(dat) +
+  geom_segment(aes(x=x1, y = y1, xend = x2, yend = y2)) +
+  ylim(0, 0.150) +
+  xlab("x") +
+  ylab("f(x)") +
+  scale_x_continuous(breaks= c(2, 10),
+              labels= c("a", "b")) +
+  scale_y_continuous(breaks = c(0, 1/8), labels = c("0", "1/(b-a)")) +
+  ggtitle("PDF of X~U(a,b)") +
+  theme_classic() +
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=14))
+```
+
+### Area to the Left
+
+To find the probability of being less than a point $q$, i.e.
+
+$$ P(X<q) = \int_{-\infty}^qf(t)dt,$$
+we can use the 
+
+<p class = "tt">punif(q, min = a, max = b)</p>
+
+function. If no values are specified for $a$ and $b$, R will assume you want the interval $(0,1)$ by default.
+
+<div class = "example">
+**Example** Suppose $X$ follows a uniform distribution from 7 to 23. What is the probability that $X$ is less than 19?
+
+</div>
+
+<div class = "solution">
+**Solution** $P(X<19)=$
+
+```{r, echo = TRUE}
+punif(19, 7, 23)
+```
+
+Visually, this looks like:
+
+```{r, warning = FALSE, message = FALSE}
+f <- function(x){
+  if(7<= x & x <= 23) y <- 1/16
+  else y <- 0
+  return(y)
+}
+
+x = seq(from=7,to=23,by=.005)
+y = sapply(X=x,FUN=f,simplify=TRUE,USE.NAMES=FALSE)
+df = data.frame(X=x,Y=y)
+
+ggplot(data=df, mapping=aes(x=X, y=Y)) +
+    geom_line()+
+    geom_area(mapping=aes(x=ifelse(x>7 & x<19, x, 0)), fill="#e6fcf8", alpha=1, color = "black") +
+    ylim(0, 0.07) +
+    xlim(5, 25) +
+   xlab("x") +
+    ylab("f(x)") +
+    ggtitle("P(X<19) for X~U(7,23)") +
+   theme_classic() +
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=14)) +
+  annotate("text", x = 13, y = 0.03, label = "punif(19, 7, 23)", 
+           col = "darkolivegreen", size = 5) +
+  annotate("segment", x = 7.3, xend = 18.7, y = 0.035, yend = 0.035,
+           arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")),
+           col = "darkolivegreen")
+
+```
+</div>
+
+### Area to the Right
+
+To find the probability of being greater than a point $q$, i.e.
+
+$$ P(X>q) = \int_{q}^{\infty}f(t)dt,$$
+we can use either
+
+<p class = "tt">1 - punif(q, min = a, max = b)</p>
+
+or
+
+<p class = "tt"> punif(q, min = a, max = b, lower.tail = FALSE) </p>
+
+function. As the area under the curve is equal to 1, the probability of being greater than the point $q$ is the complement of the probability of being less than the point $q$.
+
+<div class = "example">
+**Example** Suppose $X$ follows a uniform distribution from 18 to 38. What is the probability that $X$ is greater than 24?
+
+</div>
+
+<div class = "solution">
+**Solution** $P(X>24)=$
+
+```{r, echo = TRUE}
+1 - punif(24, 18, 38)
+```
+
+or
+
+```{r, echo = TRUE}
+punif(24, 18, 38, lower.tail = FALSE)
+```
+
+Visually, this looks like:
+
+```{r, warning = FALSE, message = FALSE}
+f <- function(x){
+  if(18<= x & x <= 38) y <- 1/20
+  else y <- 0
+  return(y)
+}
+
+x = seq(from=18,to=38,by=.005)
+y = sapply(X=x,FUN=f,simplify=TRUE,USE.NAMES=FALSE)
+df = data.frame(X=x,Y=y)
+
+ggplot(data=df, mapping=aes(x=X, y=Y)) +
+    geom_line()+
+    geom_area(mapping=aes(x=ifelse(x>24 & x<38, x, 0)), fill="#e6fcf8", alpha=1, color = "black") +
+    ylim(0, 0.07) +
+    xlim(15, 40) +
+   xlab("x") +
+    ylab("f(x)") +
+    ggtitle("P(X>24) for X~U(18,38)") +
+   theme_classic() +
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=14)) +
+  annotate("text", x = 21, y = 0.03, label = "punif(24, 18, 38)", 
+           col = "tomato3", size = 5) +
+  annotate("segment", x = 18, xend = 23.8, y = 0.035, yend = 0.035,
+           arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")),
+           col = "tomato3") +
+  annotate("text", x = 31, y = 0.03, label = "1 - punif(24, 18, 38)", 
+           col = "darkolivegreen", size = 5) +
+  annotate("segment", x = 24.2, xend = 37.8, y = 0.035, yend = 0.035,
+           arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")),
+           col = "darkolivegreen")
+```
+
+</div>
+
+### Area Between Two Points
+
+To find the probability of being between two points $q$ and $r$ (where $q<r$), i.e.
+
+$$ P(q<X<r) = \int_{q}^{r}f(t)dt,$$
+we can use the <p class = "tt">punif()</p> function as:
+
+<p class = "tt">punif(r, min = a, max = b) - punif(q, min = a, max = b)</p>
+
+
+. As the <p class = "tt">punif()</p> function gives the area to the left of the point, subtracting the area to the left of the smaller number from the area to the left of the larger number will give the area inbetween.
+
+<div class = "example">
+
+**Example** Suppose $X$ follows a uniform distribution from 3 to 25. What is the probability that $X$ is between 11 and 24?
+
+</div>
+
+<div class = "solution">
+**Solution** $P(11 < X < 24)=$
+
+```{r, echo = TRUE}
+punif(24, 3, 25) - punif(11, 3, 25)
+```
+
+Visually, this looks like:
+
+```{r, warning = FALSE, message = FALSE}
+f <- function(x){
+  if(3<= x & x <= 25) y <- 1/22
+  else y <- 0
+  return(y)
+}
+
+x = seq(from=3,to=25,by=.005)
+y = sapply(X=x,FUN=f,simplify=TRUE,USE.NAMES=FALSE)
+df = data.frame(X=x,Y=y)
+
+ggplot(data=df, mapping=aes(x=X, y=Y)) +
+    geom_line()+
+    geom_area(mapping=aes(x=ifelse(x>11 & x<24, x, 0)), fill="#e6fcf8", alpha=1, color = "black") +
+    ylim(0, 0.07) +
+    xlim(1, 27) +
+   xlab("x") +
+    ylab("f(x)") +
+    ggtitle("P(11 < X < 23) for X~U(3,25)") +
+   theme_classic() +
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=14)) +
+  annotate("text", x = 7, y = 0.025, label = "punif(11, 3, 25)", 
+           col = "tomato3", size = 5) +
+  annotate("segment", x = 3, xend = 10.8, y = 0.03, yend = 0.03,
+           arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")),
+           col = "tomato3") +
+  annotate("text", x = 14, y = 0.035, label = "punif(24, 3, 25)", 
+           col = "tomato3", size = 5) +
+  annotate("segment", x = 3, xend = 23.8, y = 0.04, yend = 0.04,
+           arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")),
+           col = "tomato3") +
+  annotate("text", x = 18, y = 0.025, label = "punif(24, 3, 25) - punif(11, 3, 5)", 
+           col = "darkolivegreen", size = 5) +
+  annotate("segment", x = 11.2, xend = 23.8, y = 0.03, yend = 0.03,
+           arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")),
+           col = "darkolivegreen") 
+```
+
+</div>
+
+### Exercises
+
+1. When Chris pours himself a glass of water, the height of the water in his glass follows a uniform distribution between 20 and 24 cm. What is the probability he has more than 20.9 cm of water in his glass?
+
+```{r unif1, exercise = TRUE}
+
+```
+
+```{r unif1-solution}
+# Solution 1
+1 - punif(20.9, 20, 24)
+# Solution 2
+punif(20.9, 20, 24, lower.tail = FALSE)
+```
+
+2. The amount of time it takes Jasmine to brush her teeth follows a uniform distribution between 62 and 79 seconds. What is the probability it takes her less than 71 seconds to brush her teeth?
+
+```{r unif2, exercise = TRUE}
+
+```
+
+```{r unif2-solution}
+punif(71, 62, 79)
+```
+
+3. When cutting a piece of plywood that is meant to be 60 cm long, Eric actually cuts the length following a uniform distribution between 58 and 62 cm. What is the probability he cuts a piece of plywood within 0.5 cm of the intended length?
+
+```{r unif3, exercise = TRUE}
+
+```
+
+```{r unif3-solution}
+# Solution
+punif(60.5, 58, 62) - punif(59.5, 58, 62)
+```
+
+```{r unif3-hint}
+# **Hint:** The intended length is 60 cm. Within 0.5cm of the intended length means between 0.5 below and 0.5 above the intended length.
+```
+
+*Click through the hints to reveal the solution*
+
+<!-- <div id="unif3-hint"> -->
+<!-- **Hint:** The intended length is 60 cm. Within 0.5cm of the intended length means between 0.5 below and 0.5 above the intended length. -->
+<!-- </div> -->
+
+### Percentiles
+
+By definition, the $p^{\text{th}}$ percentile is the point $q$ such that $P(X<q) = p$. That is to say, the area to the left of the point $q$ is $p$. 
+
+To find the $p^{\text{th}}$ percentile of an $U(a,b)$ distribution, i.e. the point $q$ such that
+
+$$ P(X<q) = \int_{-\infty}^qf(t)dt = p$$
+we can use the 
+
+<p class = "tt">qunif(p, min = a, max = b)</p>
+
+function. If no values are specified for $a$ and $b$, R will assume you want the interval $(0,1)$ by default.
+
+<div class = "example">
+**Example** Suppose $X$ follows a uniform distribution from 50 to 78. What is the $67^{\text{th}}$ percentile of the distribution? 
+
+</div>
+
+<div class = "solution">
+**Solution** Find $q$ such that $P(X<q)=0.67$
+
+```{r, echo = TRUE}
+qunif(0.67, 50, 78)
+```
+
+Visually, this looks like:
+
+```{r, warning = FALSE, message = FALSE}
+f <- function(x){
+  if(50<= x & x <= 78) y <- 1/28
+  else y <- 0
+  return(y)
+}
+
+x = seq(from=50,to=78,by=.005)
+y = sapply(X=x,FUN=f,simplify=TRUE,USE.NAMES=FALSE)
+df = data.frame(X=x,Y=y)
+
+circles <- data.frame(
+  x0 = 68.76,
+  y0 = 0
+)
+
+ggplot(data=df, mapping=aes(x=X, y=Y)) +
+    geom_line()+
+    geom_area(mapping=aes(x=ifelse(x>50 & x < 68.76, x, 0)), fill="#e6fcf8", alpha=1, color = "black") +
+    ylim(0, 0.055) +
+    xlim(48, 80) +
+   xlab("x") +
+    ylab("f(x)") +
+    ggtitle("P(X < q) = 0.67 for X~U(50,78)") +
+   theme_classic() +
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=14)) +
+  annotate("text", x = 59, y = 0.02, label = "0.67", 
+           col = "darkolivegreen", size = 5) +
+  annotate("segment",  x = 71, xend = 68.78, y = 0.01, yend = 0,
+           arrow = arrow(),
+           col = "darkolivegreen") +
+  annotate("text", x = 72.5, y = 0.012, label = "68.76", size = 5) +
+  geom_point(data = circles, aes(x = x0, y = y0), size = 4, pch = 1, col = "tomato3")
+
+```
+</div>
+
+<div class = "boxed">
+**NOTE**: When we used the punif() function, we inputted the value of $q$ to find the probability $p$. When we used the qunif() function, we inputted the probability $p$ to find the value $q$. They are inverse functions of one another.
+</div>
+
+
+
+
+### Exercises
+
+4. Weights of marbles created using a certain process follow a uniform distribution between 15 and 18 grams. What is the $87^{\text{th}}$ percentile of the distirbution of weights?
+
+```{r unif4, exercise = TRUE}
+
+```
+
+```{r unif4-solution}
+qunif(0.87, 15, 18)
+```
+
+5. (*More Challenging*) Jun always arrives to his homeroom class between 1 and 3 minutes early following a uniform distribution. If there is a 0.31 chance he will arrive between 2 and $q$ minutes early, what is the value of $q$?
+
+```{r unif5, exercise = TRUE}
+
+```
+
+```{r unif5-hint-1}
+# Hint 1
+# This is a uniform distribution. The distance between 2 and $q$ is the same at the distance between 1 and the 31st percentile.
+```
+
+```{r unif5-hint-2}
+# Hint 2
+# qunif(0.31, 1, 3) is the distance from 1 to the 31st percentile. How should we adjust it?
+```
+
+```{r unif5-solution}
+# Solution
+2 + qunif(0.31, 1, 3)
+```
+
+*Click through the hints to see the solution.*
+
+### Random Values
+
+Using R, we can generate a vector of values from a uniform, $U(a,b)$, distribution by using the 
+
+<p class = "tt"> runif(n, min = a, max = b) </p>
+
+function. This will generate a vector of size $n$ with $n$ values from a $U(a,b)$ distribution. This vector can also be saved to an object if needed.
+
+<div class = "example">
+
+**Example** Create a vector with 15 observations from a uniform distribution from 20 to 63.
+
+</div>
+
+<div class = "solution">
+
+**Solution**
+
+```{r, echo = TRUE}
+runif(50, 20, 63)
+```
+
+You will note that all these values fall between 20 and 63.
+
+</div>
+
+### Exercises
+
+6. Alice has no idea how to answer any of the short answer probability questions on her takehome test but she knows probabilities have to be between 0 and 1. If her test has 14 short answer problems, generate a vector of answers she could use for guessing the final numeric result on the short answer portion of the test using a uniform distribution.
+
+```{r unif6, exercise = TRUE}
+
+```
+
+```{r unif6-solution}
+runif(14, 0, 1)
+```
+
+
+## The Normal Distribution
+
+
+## The Binomial Distribution
