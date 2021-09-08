@@ -353,7 +353,8 @@ punif(60.5, 58, 62) - punif(59.5, 58, 62)
 ```
 
 ```{r unif3-hint}
-# **Hint:** The intended length is 60 cm. Within 0.5cm of the intended length means between 0.5 below and 0.5 above the intended length.
+# **Hint:** The intended length is 60 cm. Within 0.5cm of the intended length means between 0.5 below and 0.5 above 
+# the intended length.
 ```
 
 *Click through the hints to reveal the solution*
@@ -375,16 +376,68 @@ we can use the
 
 function. If no values are specified for $a$ and $b$, R will assume you want the interval $(0,1)$ by default.
 
+<!-- <div class = "example"> -->
+<!-- **Example** Suppose $X$ follows a uniform distribution from 50 to 78. What is the $67^{\text{th}}$ percentile of the distribution?  -->
+
+<!-- </div> -->
+
+<!-- <div class = "solution"> -->
+<!-- **Solution** Find $q$ such that $P(X<q)=0.67$ -->
+
+<!-- ```{r, echo = TRUE} -->
+<!-- qunif(0.67, 50, 78) -->
+<!-- ``` -->
+
+<!-- Visually, this looks like: -->
+
+<!-- ```{r, warning = FALSE, message = FALSE} -->
+<!-- f <- function(x){ -->
+<!--   if(50<= x & x <= 78) y <- 1/28 -->
+<!--   else y <- 0 -->
+<!--   return(y) -->
+<!-- } -->
+
+<!-- x = seq(from=50,to=78,by=.005) -->
+<!-- y = sapply(X=x,FUN=f,simplify=TRUE,USE.NAMES=FALSE) -->
+<!-- df = data.frame(X=x,Y=y) -->
+
+<!-- circles <- data.frame( -->
+<!--   x0 = 68.76, -->
+<!--   y0 = 0 -->
+<!-- ) -->
+
+<!-- ggplot(data=df, mapping=aes(x=X, y=Y)) + -->
+<!--     geom_line()+ -->
+<!--     geom_area(mapping=aes(x=ifelse(x>50 & x < 68.76, x, 0)), fill="#e6fcf8", alpha=1, color = "black") + -->
+<!--     ylim(0, 0.055) + -->
+<!--     xlim(48, 80) + -->
+<!--    xlab("x") + -->
+<!--     ylab("f(x)") + -->
+<!--     ggtitle("P(X < q) = 0.67 for X~U(50,78)") + -->
+<!--    theme_classic() + -->
+<!--   theme(axis.text=element_text(size=12), -->
+<!--         axis.title=element_text(size=14)) + -->
+<!--   annotate("text", x = 59, y = 0.02, label = "0.67",  -->
+<!--            col = "darkolivegreen", size = 5) + -->
+<!--   annotate("segment",  x = 71, xend = 68.78, y = 0.01, yend = 0, -->
+<!--            arrow = arrow(), -->
+<!--            col = "darkolivegreen") + -->
+<!--   annotate("text", x = 72.5, y = 0.012, label = "68.76", size = 5) + -->
+<!--   geom_point(data = circles, aes(x = x0, y = y0), size = 4, pch = 1, col = "tomato3") -->
+
+<!-- ``` -->
+<!-- </div> -->
+
 <div class = "example">
-**Example** Suppose $X$ follows a uniform distribution from 50 to 78. What is the $67^{\text{th}}$ percentile of the distribution? 
+**Example** Suppose $X$ follows a uniform distribution from 50 to 78. What is the $55^{\text{th}}$ percentile of the distribution? 
 
 </div>
 
 <div class = "solution">
-**Solution** Find $q$ such that $P(X<q)=0.67$
+**Solution** Find $q$ such that $P(X<q)=0.55$
 
 ```{r, echo = TRUE}
-qunif(0.67, 50, 78)
+qunif(0.55, 50, 78)
 ```
 
 Visually, this looks like:
@@ -401,27 +454,27 @@ y = sapply(X=x,FUN=f,simplify=TRUE,USE.NAMES=FALSE)
 df = data.frame(X=x,Y=y)
 
 circles <- data.frame(
-  x0 = 68.76,
+  x0 = 65.4,
   y0 = 0
 )
 
 ggplot(data=df, mapping=aes(x=X, y=Y)) +
     geom_line()+
-    geom_area(mapping=aes(x=ifelse(x>50 & x < 68.76, x, 0)), fill="#e6fcf8", alpha=1, color = "black") +
+    geom_area(mapping=aes(x=ifelse(x>50 & x < 65.4, x, 0)), fill="#e6fcf8", alpha=1, color = "black") +
     ylim(0, 0.055) +
     xlim(48, 80) +
    xlab("x") +
     ylab("f(x)") +
-    ggtitle("P(X < q) = 0.67 for X~U(50,78)") +
+    ggtitle("P(X < q) = 0.55 for X~U(50,78)") +
    theme_classic() +
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=14)) +
-  annotate("text", x = 59, y = 0.02, label = "0.67", 
+  annotate("text", x = 59, y = 0.02, label = "0.55", 
            col = "darkolivegreen", size = 5) +
-  annotate("segment",  x = 71, xend = 68.78, y = 0.01, yend = 0,
+  annotate("segment",  x = 68, xend = 65.4, y = 0.01, yend = 0,
            arrow = arrow(),
            col = "darkolivegreen") +
-  annotate("text", x = 72.5, y = 0.012, label = "68.76", size = 5) +
+  annotate("text", x = 69.5, y = 0.012, label = "65.4", size = 5) +
   geom_point(data = circles, aes(x = x0, y = y0), size = 4, pch = 1, col = "tomato3")
 
 ```

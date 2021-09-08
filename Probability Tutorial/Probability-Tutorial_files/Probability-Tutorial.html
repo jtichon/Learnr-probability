@@ -309,7 +309,8 @@ punif(20.9, 20, 24, lower.tail = FALSE)</code></pre>
 punif(60.5, 58, 62) - punif(59.5, 58, 62)</code></pre>
 </div>
 <div class="tutorial-exercise-support" data-label="unif3-hint" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># **Hint:** The intended length is 60 cm. Within 0.5cm of the intended length means between 0.5 below and 0.5 above the intended length.</code></pre>
+<pre class="text"><code># **Hint:** The intended length is 60 cm. Within 0.5cm of the intended length means between 0.5 below and 0.5 above 
+# the intended length.</code></pre>
 </div>
 <p><em>Click through the hints to reveal the solution</em></p>
 <!-- <div id="unif3-hint"> -->
@@ -325,13 +326,55 @@ punif(60.5, 58, 62) - punif(59.5, 58, 62)</code></pre>
 qunif(p, min = a, max = b)
 </p>
 <p>function. If no values are specified for <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, R will assume you want the interval <span class="math inline">\((0,1)\)</span> by default.</p>
+<!-- <div class = "example"> -->
+<!-- **Example** Suppose $X$ follows a uniform distribution from 50 to 78. What is the $67^{\text{th}}$ percentile of the distribution?  -->
+<!-- </div> -->
+<!-- <div class = "solution"> -->
+<!-- **Solution** Find $q$ such that $P(X<q)=0.67$ -->
+<!-- ```{r, echo = TRUE} -->
+<!-- qunif(0.67, 50, 78) -->
+<!-- ``` -->
+<!-- Visually, this looks like: -->
+<!-- ```{r, warning = FALSE, message = FALSE} -->
+<!-- f <- function(x){ -->
+<!--   if(50<= x & x <= 78) y <- 1/28 -->
+<!--   else y <- 0 -->
+<!--   return(y) -->
+<!-- } -->
+<!-- x = seq(from=50,to=78,by=.005) -->
+<!-- y = sapply(X=x,FUN=f,simplify=TRUE,USE.NAMES=FALSE) -->
+<!-- df = data.frame(X=x,Y=y) -->
+<!-- circles <- data.frame( -->
+<!--   x0 = 68.76, -->
+<!--   y0 = 0 -->
+<!-- ) -->
+<!-- ggplot(data=df, mapping=aes(x=X, y=Y)) + -->
+<!--     geom_line()+ -->
+<!--     geom_area(mapping=aes(x=ifelse(x>50 & x < 68.76, x, 0)), fill="#e6fcf8", alpha=1, color = "black") + -->
+<!--     ylim(0, 0.055) + -->
+<!--     xlim(48, 80) + -->
+<!--    xlab("x") + -->
+<!--     ylab("f(x)") + -->
+<!--     ggtitle("P(X < q) = 0.67 for X~U(50,78)") + -->
+<!--    theme_classic() + -->
+<!--   theme(axis.text=element_text(size=12), -->
+<!--         axis.title=element_text(size=14)) + -->
+<!--   annotate("text", x = 59, y = 0.02, label = "0.67",  -->
+<!--            col = "darkolivegreen", size = 5) + -->
+<!--   annotate("segment",  x = 71, xend = 68.78, y = 0.01, yend = 0, -->
+<!--            arrow = arrow(), -->
+<!--            col = "darkolivegreen") + -->
+<!--   annotate("text", x = 72.5, y = 0.012, label = "68.76", size = 5) + -->
+<!--   geom_point(data = circles, aes(x = x0, y = y0), size = 4, pch = 1, col = "tomato3") -->
+<!-- ``` -->
+<!-- </div> -->
 <div class="example">
-<p><strong>Example</strong> Suppose <span class="math inline">\(X\)</span> follows a uniform distribution from 50 to 78. What is the <span class="math inline">\(67^{\text{th}}\)</span> percentile of the distribution?</p>
+<p><strong>Example</strong> Suppose <span class="math inline">\(X\)</span> follows a uniform distribution from 50 to 78. What is the <span class="math inline">\(55^{\text{th}}\)</span> percentile of the distribution?</p>
 </div>
 <div class="solution">
-<p><strong>Solution</strong> Find <span class="math inline">\(q\)</span> such that <span class="math inline">\(P(X&lt;q)=0.67\)</span></p>
-<pre class="r"><code>qunif(0.67, 50, 78)</code></pre>
-<pre><code>## [1] 68.76</code></pre>
+<p><strong>Solution</strong> Find <span class="math inline">\(q\)</span> such that <span class="math inline">\(P(X&lt;q)=0.55\)</span></p>
+<pre class="r"><code>qunif(0.55, 50, 78)</code></pre>
+<pre><code>## [1] 65.4</code></pre>
 <p>Visually, this looks like:</p>
 <p><img src="Probability-Tutorial_files/figure-html/unnamed-chunk-10-1.png" width="624" /></p>
 </div>
@@ -383,13 +426,13 @@ runif(n, min = a, max = b)
 <div class="solution">
 <p><strong>Solution</strong></p>
 <pre class="r"><code>runif(50, 20, 63)</code></pre>
-<pre><code>##  [1] 30.51450 29.82887 41.85755 49.49074 35.60034 34.08221 44.35739 39.46901
-##  [9] 27.25063 58.55926 55.96959 47.41055 29.01372 47.14203 45.13533 35.35195
-## [17] 50.62278 44.24781 22.93467 56.67284 60.66443 61.98810 48.97292 28.49974
-## [25] 58.86429 36.51416 22.22369 58.97118 29.00945 42.39530 31.27554 21.54485
-## [33] 60.08234 54.06174 59.57388 32.89655 27.22637 35.96629 39.67713 26.10817
-## [41] 34.52223 52.67755 31.55414 33.12217 40.31208 52.44942 34.38926 30.88122
-## [49] 34.62125 51.14240</code></pre>
+<pre><code>##  [1] 49.56789 52.19369 22.63360 29.83136 55.30273 51.58347 28.76672 50.89937
+##  [9] 62.88675 42.16144 43.09501 21.39242 39.67446 51.94471 55.78554 56.46485
+## [17] 53.12986 62.99526 62.66643 62.58360 24.27332 25.75625 35.23715 45.86798
+## [25] 52.68473 45.51602 56.01133 24.36447 37.66114 47.72492 22.71469 32.18242
+## [33] 21.05996 27.79724 25.08227 52.23908 21.43339 60.06140 34.23544 23.73163
+## [41] 41.41703 39.21229 44.43239 53.81472 62.02540 60.70113 55.87085 37.47107
+## [49] 27.28540 46.65462</code></pre>
 <p>You will note that all these values fall between 20 and 63.</p>
 </div>
 </div>
